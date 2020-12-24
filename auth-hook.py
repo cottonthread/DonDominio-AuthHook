@@ -51,7 +51,6 @@ if response.get('success') is True:
 				print ("*" * 20)
 				# 组装修改申请
 				dataurl2 = {'apiuser': apiuser, 'apipasswd': apipasswd, 'name': name, 'serviceName': certbot_domain, 'entityID': entityID, 'value': certbot_validation}
-				count = 0
 				# 获取修改结果
 				response = json.loads(requests.post(url2, data=dataurl2).text)
 				print("Done, results:")
@@ -72,7 +71,6 @@ if response.get('success') is True:
 			print(name, "is not in", certbot_domain, "so creating...")
 			# 组装修改申请
 			dataurl3 = {'apiuser': apiuser, 'apipasswd': apipasswd, 'name': name, 'serviceName': certbot_domain, 'type': "TXT", 'value': certbot_validation, "ttl": 600}
-			count = 0
 			# 获取修改结果
 			response = json.loads(requests.post(url3, data=dataurl3).text)
 			print("Done, results:")
