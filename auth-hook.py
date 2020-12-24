@@ -17,6 +17,7 @@ apiuser = apiconf[0].strip()
 apipasswd = apiconf[1].strip()
 url1 = "https://simple-api.dondominio.net/service/dnslist/"
 url2 = "https://simple-api.dondominio.net/service/dnsupdate/"
+url3 = "https://simple-api.dondominio.net/service/dnscreate/"
 certbot_domain = str(os.getenv('CERTBOT_DOMAIN'))
 certbot_validation = str(os.getenv('CERTBOT_VALIDATION'))
 certbot_token = os.getenv('CERTBOT_TOKEN')
@@ -50,10 +51,10 @@ else:
 	# 获取结果中符合 certbot_domain 的 entityID
 	keys = response.get('responseData').get('dns')
 	for key in keys:
-		# 其实每个key都是一个字典
-		if key.get('name') == name:
+		# 假如已经存在相应的TXT项，只需要更新相关内容的话
+		if name in key.values():
+			print(key.get('name'), "has entityID", key.get('entityID'))
 			entityID = key.get('entityID')
-			print(key.get('name'), "has entityID", entityID)
 			print ("*" * 20)
 			if key.get('value') == certbot_validation:
 				# 如果要更新的值和已有的值一样，那就别管了
@@ -83,8 +84,24 @@ else:
 					# 这里是不是要发封邮件啊？
 			print ("*" * 20)
 			break
+		# 假如没有相应的TXT项，需要创建的话
 		else:
-			pass
-	# 如果数据都遍历完了，还是找不到_acme-challenge.怎么办？应该有个创建用的语法：
-	# if (name in key.values()) 拿着DonDominio的数据验证一下
+			print(name, "is not in", certbot_domain, "so creating...")
+			# 组装修改申请
+			dataurl3 = {'apiuser': apiuser, 'apipasswd': apipasswd, 'name': name, 'serviceName': certbot_domain, 'type': "TXT", 'value': certbot_validation, "ttl": "3600"}
+			count = 0
+			# 获取修改结果
+			response = json.loads(requests.post(url3, data=dataurl3).text)
+			print("Done, results:")
+			for key, value in response.items():
+				count = count + 1
+				# 只需要回复的前5条记录
+				if count <= 5:
+					print (key + ":", value)
+				else:
+					pass
+			if response.get('success') is False:
+				print("Error Ocurred!\n" + "*" * 20)
+				# 这里是不是要发封邮件啊？
+		print ("*" * 20)
 	time.sleep(25)
