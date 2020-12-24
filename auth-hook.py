@@ -32,12 +32,6 @@ if response.get('success') is True:
 			pass
 		else:
 			print(key, value)
-else:
-	for key, value in response.items():
-		print(key, value)
-	# 这里是不是要发封邮件啊？
-		
-else:
 	# 获取结果中符合 certbot_domain 的 entityID
 	keys = response.get('responseData').get('dns')
 	for key in keys:
@@ -94,3 +88,7 @@ else:
 				# 这里是不是要发封邮件啊？
 		print ("*" * 20)
 	time.sleep(25)
+else:
+	for key, value in response.items():
+		print(key, value)
+	# 这里是不是要发封邮件啊？
