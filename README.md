@@ -12,7 +12,7 @@ sudo yum install -y epel-release yum-utils certbot.noarch python3
 
 #### Para obtener por primera vez el certificado:
 ```
-certbot certonly --logs-dir $HOME/DonDominio/ --work-dir $HOME/DonDominio-AuthHook/ --config-dir $HOME/DonDominio-AuthHook/ --manual --manual-auth-hook $HOME/DonDominio-AuthHook/auth-hook.py --deploy-hook $HOME/DonDominio-AuthHook/deploy-hook.sh -d ***.dominio.com*** --preferred-challenges=dns --agree-tos --no-eff-email --manual-public-ip-logging-ok -m register@dominio.com
+certbot certonly --logs-dir $HOME/DonDominio-AuthHook/ --work-dir $HOME/DonDominio-AuthHook/ --config-dir $HOME/DonDominio-AuthHook/ --manual --manual-auth-hook $HOME/DonDominio-AuthHook/auth-hook.py --deploy-hook $HOME/DonDominio-AuthHook/deploy-hook.sh -d ***.dominio.com*** --preferred-challenges=dns --agree-tos --no-eff-email --manual-public-ip-logging-ok -m register@dominio.com
 ```
 
 ### Para obtener la renovación del certificado:
