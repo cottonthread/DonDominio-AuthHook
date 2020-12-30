@@ -19,11 +19,11 @@ CentOS:
 `
 sudo yum install -y epel-release yum-utils certbot.noarch python3 git
 `
-`
+```
 git clone https://github.com/cottonthread/DonDominio-AuthHook.git
 cd DonDominio-AuthHook
 vim api.conf *Con los datos preparados*
-`
+```
 
 
 ###
