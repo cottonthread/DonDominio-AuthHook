@@ -6,7 +6,8 @@ from email.mime.text import MIMEText
 from email.utils import formatdate
 
 # Colección de datos preparativos
-apiconf = open("api.conf")
+home = os.path.expanduser("~")
+apiconf = open(home + "api.conf")
 apiconf = apiconf.readlines()
 apiuser = apiconf[0].strip()
 apipasswd = apiconf[1].strip()
