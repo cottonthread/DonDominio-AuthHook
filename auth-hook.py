@@ -7,7 +7,7 @@ from email.utils import formatdate
 
 # Colección de datos preparativos
 home = os.path.expanduser("~")
-apiconf = open(home + "/api.conf")
+apiconf = open(home + "/DonDominio-AuthHook/api.conf")
 apiconf = apiconf.readlines()
 apiuser = apiconf[0].strip()
 apipasswd = apiconf[1].strip()
