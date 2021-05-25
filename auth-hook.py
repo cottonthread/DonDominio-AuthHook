@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 import os, json, requests, time, smtplib
+from tld import get_fld
 from email.header import Header
 from email.mime.text import MIMEText
 from email.utils import formatdate
@@ -22,6 +23,7 @@ certbot_token = os.getenv('CERTBOT_TOKEN')
 certbot_remaining_challenges = str(os.getenv('CERTBOT_REMAINING_CHALLENGES'))
 certbot_all_domains = str(os.getenv('CERTBOT_ALL_DOMAINS'))
 name = "_acme-challenge." + certbot_domain
+serviceName = get_fld("http://" + certbot_domain)
 entityID=""
 
 def email(title, msg):
@@ -58,7 +60,7 @@ print("Reciveced from Certbot:\nDomain: ", certbot_domain, "\tValidation:", cert
 print("Comunicating with DonDominio:")
 
 # Ensamblar los datos de petición para la lista de DNS
-dataurl1 = {'apiuser': apiuser, 'apipasswd': apipasswd, 'name': name, 'serviceName': certbot_domain}
+dataurl1 = {'apiuser': apiuser, 'apipasswd': apipasswd, 'serviceName': serviceName}
 
 # Obtención de resultados
 response = json.loads(requests.post(url1, data=dataurl1).text)
@@ -83,7 +85,7 @@ if response.get('success') is True:
 		else:
 		# Si el valor de Value NO es lo que pre-existe, proceder a la actualización
 			print("Updating", certbot_validation, "to", name)
-			dataurl2 = {'apiuser': apiuser, 'apipasswd': apipasswd, 'name': name, 'serviceName': certbot_domain, 'entityID': entityID, 'value': certbot_validation}
+			dataurl2 = {'apiuser': apiuser, 'apipasswd': apipasswd, 'serviceName': serviceName, 'entityID': entityID, 'value': certbot_validation}
 			# Ensamblar los datos de petición para la actualización del registro certbot_validation
 			dnsresult = updatedns(url2, dataurl2)
 			if dnsresult.get('success') is True:
@@ -96,8 +98,8 @@ if response.get('success') is True:
 				quit()
 	else:
 	# Negativo en capturar el entityID del "_acme-challenge." + certbot_domain
-		print(name, "is not in", certbot_domain, "so creating...")
-		dataurl3 = {'apiuser': apiuser, 'apipasswd': apipasswd, 'name': name, 'serviceName': certbot_domain, 'type': "TXT", 'value': certbot_validation, "ttl": 600}
+		print(name, "is not in", serviceName, "so creating...")
+		dataurl3 = {'apiuser': apiuser, 'apipasswd': apipasswd, 'name': name, 'serviceName': serviceName, 'type': "TXT", 'value': certbot_validation, "ttl": 600}
 		dnsresult = updatedns(url3, dataurl3)
 		if dnsresult.get('success') is True:
 		# Si el valor de Value se ha podido crear
