@@ -110,7 +110,7 @@ if response.get('success') is True:
 			print("Error, results (will be send by mail too):", dnsresult)
 			email("Error creating DNS TXT in DonDominio!", json.dumps(response, indent = 2))
 			quit()
-	time.sleep(25)
+	time.sleep(60)
 	# Esperar un tiempo si todo va bien para que Certbot tenga tiempo en verificar el certbot_validation
 else:
 # Si no se ha podido comunicar con DonDominio
