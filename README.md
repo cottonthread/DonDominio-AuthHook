@@ -2,7 +2,6 @@
 El Auth Hook para obtenter Wildcard de Let's Encrypt mediante Certbot
 
 ### Un pequeño script para ayudar a obtener certificado tipo WildCard de Let's Encrypt mediante método de verificación DNS del programa Certbot. Ya que no tiene soporte para DonDominio, pues se crea su Auth-Hook con los cretidenciales del API de DonDominio.
-#### No apto. para obtención de certificado de dominios del CNAME.
 
 ### Preparación
 
@@ -32,7 +31,7 @@ vim api.conf *Con los datos preparados*
 ```
 certbot certonly --logs-dir $HOME/DonDominio-AuthHook/ --work-dir $HOME/DonDominio-AuthHook/ --config-dir $HOME/DonDominio-AuthHook/ \
 --manual --manual-auth-hook $HOME/DonDominio-AuthHook/auth-hook.py --deploy-hook $HOME/DonDominio-AuthHook/deploy-hook.sh \
--d ***.dominio.com*** --preferred-challenges=dns --agree-tos --no-eff-email --manual-public-ip-logging-ok -m register@dominio.com
+-d ***.dominio.com*** --preferred-challenges=dns --agree-tos --no-eff-email -m register@dominio.com
 ```
 ### Para obtener la renovación del certificado:
 ```
