@@ -16,8 +16,7 @@ emailport = apiconf[3].strip()
 emailuser = apiconf[4].strip()
 emailpasswd = apiconf[5].strip()
 url1 = "https://simple-api.dondominio.net/service/dnslist/"
-url2 = "https://simple-api.dondominio.net/service/dnsupdate/"
-url3 = "https://simple-api.dondominio.net/service/dnscreate/"
+url2 = "https://simple-api.dondominio.net/service/dnscreate/"
 certbot_domain = str(os.getenv('CERTBOT_DOMAIN'))
 certbot_validation = str(os.getenv('CERTBOT_VALIDATION'))
 certbot_token = os.getenv('CERTBOT_TOKEN')
@@ -40,17 +39,8 @@ def email(title, msg):
 	smtp.sendmail(emailuser, emailuser, msg.as_string())
 	smtp.quit()
 
-def verification(name, array):
-	# Verificar si el dominio en cuestión está dentro de la tabla recibida.
-	for value in array:
-		if name in value.values():
-			return True, value
-		else:
-			pass
-	return False, "Not Found!"
-
 def updatedns(url, data):
-	# Actualizar/Crear el registro de DNS
+	# Crear el registro de DNS
 	dnsresult = json.loads(requests.post(url, data=data).text)
 	return dnsresult
 
@@ -67,49 +57,17 @@ dataurl1 = {'apiuser': apiuser, 'apipasswd': apipasswd, 'serviceName': serviceNa
 response = json.loads(requests.post(url1, data=dataurl1).text)
 
 if response.get('success') is True:
-# Si se ha podido comunicar con DonDominio
-	for key, value in response.items():
-		if key == "responseData":
-			pass
-		else:
-			print(key, value)
-	keys = response.get('responseData').get('dns')
-	if verification(name, keys)[0] is True:
-	# Positivo en capturar el entityID del "_acme-challenge." + certbot_domain
-		verificationresult = verification(name, keys)[1]
-		entityID = verificationresult.get('entityID')
-		print(name, "has entityID", entityID)
-		if verificationresult.get('value') == certbot_validation:
-		# Si el valor de Value es lo mismo que ya pre-existe, salir de la aplicación directamente
-			print("Same value of", name + ":", verificationresult.get('value'))
-			quit()
-		else:
-		# Si el valor de Value NO es lo que pre-existe, proceder a la actualización
-			print("Updating", certbot_validation, "to", name)
-			dataurl2 = {'apiuser': apiuser, 'apipasswd': apipasswd, 'serviceName': serviceName, 'entityID': entityID, 'value': certbot_validation}
-			# Ensamblar los datos de petición para la actualización del registro certbot_validation
-			dnsresult = updatedns(url2, dataurl2)
-			if dnsresult.get('success') is True:
-			# Si el valor de Value se ha podido actualizar
-				print("Done, results:", dnsresult)
-			else:
-			# Si el valor de Value NO se ha podido actualizar, aunque si por reazones que sea, hubiese sido el mismo Value, el programa acaba mucho antes en donde la verificación de pre-existencia
-				print("Error, results (will be send by mail too):", dnsresult)
-				email("Error updating DNS TXT in DonDominio!", json.dumps(response, indent = 2))
-				quit()
+# Éxito en comunicarse con el servidor, empieza a crear los registros
+	dataurl2 = {'apiuser': apiuser, 'apipasswd': apipasswd, 'name': name, 'serviceName': serviceName, 'type': "TXT", 'value': certbot_validation, "ttl": 600}
+	dnsresult = updatedns(url2, dataurl2)
+	if dnsresult.get('success') is True:
+	# Si el valor de Value se ha podido crear
+		print("Done, results:", dnsresult)
 	else:
-	# Negativo en capturar el entityID del "_acme-challenge." + certbot_domain
-		print(name, "is not in", serviceName, "so creating...")
-		dataurl3 = {'apiuser': apiuser, 'apipasswd': apipasswd, 'name': name, 'serviceName': serviceName, 'type': "TXT", 'value': certbot_validation, "ttl": 600}
-		dnsresult = updatedns(url3, dataurl3)
-		if dnsresult.get('success') is True:
-		# Si el valor de Value se ha podido crear
-			print("Done, results:", dnsresult)
-		else:
-		# Si el valor de Value NO se ha podido crear
-			print("Error, results (will be send by mail too):", dnsresult)
-			email("Error creating DNS TXT in DonDominio!", json.dumps(response, indent = 2))
-			quit()
+	# Si el valor de Value NO se ha podido crear
+		print("Error, results (will be send by mail too):", dnsresult)
+		email("Error creating DNS TXT in DonDominio!", json.dumps(response, indent = 2))
+		quit()
 	time.sleep(60)
 	# Esperar un tiempo si todo va bien para que Certbot tenga tiempo en verificar el certbot_validation
 else:
